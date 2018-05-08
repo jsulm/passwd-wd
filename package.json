@@ -1,0 +1,25 @@
+{
+  "name": "passwd_ws",
+  "version": "1.0.0",
+  "description": "Passwd as a Service",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.16.3"
+  },
+  "devDependencies": {
+    "mocha": "^5.1.1"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "passwd_ws"
+  },
+  "keywords": [
+    "passwd",
+    "service"
+  ],
+  "author": "jsulm",
+  "license": "ISC"
+}
