@@ -1,0 +1,17 @@
+{
+  "config": {
+    "version": "1.0"
+  },
+  "main": {
+    "host": "127.0.0.1",
+    "port": 8080
+  },
+  "log": {
+    "isDev": false,
+    "isDebug": false,
+    "isInfo": true,
+    "isWarn": true,
+    "isError": true,
+    "consoleLevel": "info"
+  }
+}
