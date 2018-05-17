@@ -19,23 +19,45 @@ const config = require('../lib/common/config.js');
 const httpHelper = require('../lib/server/http-helper.js');
 const logger = require('../lib/common/logger.js');
 
+const HTTP_C = require('../lib/common/http-constants.js');
+
 const services = {
   users: require('./service/users.js'),
   groups: require('./service/groups.js')
 };
 
 let start = function () {
+  app.use(function(req, res, next) {
+    req.locals = {};
+    next();
+  });
   let router = express.Router();
+
+  router.param('uid', function(req, res, next) {
+    let tokens = req.url.split('/');
+    req.locals.uid = tokens[tokens.length - 1];
+
+    if (isNaN(req.locals.uid) || req.locals.uid < 0) {
+      httpHelper.saveErrorDetailsInRequest(req, HTTP_C.BAD_REQUEST);
+      httpHelper.saveResultInRequest(HTTP_C.BAD_REQUEST, '');
+      next(HTTP_C.BAD_REQUEST);
+    } else {
+      next();
+    }
+  });
+
+
+  router.route('/v1/users/:uid')
+  .get(services.users.getUser);
+
   router.route('/v1/users')
+  .get(services.users.getUsers);
+
+  router.route('/v1/users/query')
   .get(services.users.getUsers);
 
   // router.route('/v1/groups')
   // .get(services.groups.getGroups);
-
-router.route('/v1/test')
-.get(function(req, res) {
-  res.send('test');
-});
 
   app.use('/', router);
   app.disable('x-powered-by');
