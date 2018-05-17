@@ -39,7 +39,7 @@ let start = function () {
 
     if (isNaN(req.locals.uid) || req.locals.uid < 0) {
       httpHelper.saveErrorDetailsInRequest(req, HTTP_C.BAD_REQUEST);
-      httpHelper.saveResultInRequest(HTTP_C.BAD_REQUEST, '');
+      httpHelper.saveResultInRequest(req, HTTP_C.BAD_REQUEST, '');
       next(HTTP_C.BAD_REQUEST);
     } else {
       next();
@@ -69,6 +69,11 @@ let start = function () {
   router.use(httpHelper.processResults);
   router.use(httpHelper.processErrorDetails);
   router.use(httpHelper.sendResults);
+
+  // Exception handling
+  app.use(logExceptionHandler);
+  app.use(clientExceptionHandler);
+  app.use(catchAllExceptionHandler);
 };
 
 console.log('info: ----------------------------------------------------------');
@@ -82,3 +87,34 @@ config.loadConfig(function configReturn(isConfigLoaded) {
 
   start();
 })
+
+// Log the exception
+let logExceptionHandler = function(err, req, res, next) {
+  if (err.stack !== undefined) {
+    logger.log('error', 'Exception Stack: ' + err.stack);
+  }
+
+  next(err);
+};
+
+// Specific responses sent to client on an exception.
+let clientExceptionHandler = function(err, req, res, next) {
+  if (req.xhr) {
+    res.status(HTTP_C.INTERNAL_SERVER_ERROR.code).send(
+        {error: HTTP_C.INTERNAL_SERVER_ERROR.text});
+  } else {
+    next(err);
+  }
+};
+
+// A catch-all response to send to client if the exception is not already handled.
+let catchAllExceptionHandler = function(err, req, res, next) {
+  if ( (req.readyToSend === undefined) ||
+       (Object.keys(req.readyToSend).length === 0) ) {
+    res.status(HTTP_C.INTERNAL_SERVER_ERROR.code)
+        .send();
+  } else {
+    res.status(req.readyToSend.code)
+        .send();
+  }
+};
