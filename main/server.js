@@ -47,14 +47,14 @@ let start = function () {
   });
 
 
-  router.route('/v1/users/:uid')
+  router.route('/v1/users/:uid(\\d+)')
   .get(services.users.getUser);
 
   router.route('/v1/users')
-  .get(services.users.getUsers);
+  .get(services.users.getAllUsers);
 
   router.route('/v1/users/query')
-  .get(services.users.getUsers);
+  .get(services.users.getUsersQuery);
 
   // router.route('/v1/groups')
   // .get(services.groups.getGroups);
@@ -85,6 +85,8 @@ config.loadConfig(function configReturn(isConfigLoaded) {
     return;
   }
 
+  services.users.setPasswdFile(config.passwdFile);
+
   start();
 })
 
@@ -109,12 +111,25 @@ let clientExceptionHandler = function(err, req, res, next) {
 
 // A catch-all response to send to client if the exception is not already handled.
 let catchAllExceptionHandler = function(err, req, res, next) {
+  let error = HTTP_C.INTERNAL_SERVER_ERROR.code;
   if ( (req.readyToSend === undefined) ||
        (Object.keys(req.readyToSend).length === 0) ) {
-    res.status(HTTP_C.INTERNAL_SERVER_ERROR.code)
+    res.status(error)
         .send();
   } else {
-    res.status(req.readyToSend.code)
+    error = req.readyToSend.code;
+    res.status(error)
         .send();
   }
+
+  // Error logging
+  let ip = (req.locals !== undefined && req.locals.ip != undefined) ?
+      ' ' + req.locals.ip : '';
+  let result = req.readyToSend.result !== undefined ?
+      ' ' + req.readyToSend.result : '';
+  logger.log('error', 'Sending ' + req.readyToSend.code +
+                     result +
+                     ip);
+
+  next();
 };

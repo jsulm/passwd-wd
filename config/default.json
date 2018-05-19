@@ -13,5 +13,7 @@
     "isWarn": true,
     "isError": true,
     "consoleLevel": "dev"
-  }
+  },
+  "passwdFile": "/etc/passwd",
+  "groupFile": "/etc/group"
 }
