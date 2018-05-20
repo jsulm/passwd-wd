@@ -1,5 +1,5 @@
 /**
- * Library to retrieve info from etc/passwd users.
+ * Library to retrieve system user info from /etc/passwd.
  *
  * @author Jeff Sulm
  * @license 2018
@@ -7,14 +7,21 @@
 
 'use strict';
 
-// const async = require('async');
 const HTTP_C = require('../../lib/common/http-constants.js');
 const httpHelper = require('../../lib/server/http-helper.js');
 const passwdHelper = require('../../lib/server/passwd-helper.js');
 
 let passwdFile = '';
+let groupFile = '';
 
-exports.getAllUsers = function(req, rex, callback) {
+/**
+ * Returns all users on the system.
+ * @param {*} req
+ * @param {*} rex
+ * @param {*} callback
+ * @example GET /users
+ */
+exports.getAllUsers = function(req, res, callback) {
   let outputArray = [];
   let status = HTTP_C.OK;
   let retval = '';
@@ -60,17 +67,6 @@ exports.getUsersQuery = function(req, res, callback) {
   let comment = '';
   let home = '';
   let shell = '';
-
-  for (let property in req.query) {
-    if (req.query.hasOwnProperty(property)) {
-      // Validate all params.
-      console.log(property);
-
-    }
-  }
-
-  let keys = Object.keys(req.query);
-  console.log(keys);
 
   // Validate query params
   let allParamNamesValid = true;
@@ -163,19 +159,18 @@ exports.getUsersQuery = function(req, res, callback) {
   loadUserData(returnLoadUserData);
 };
 
+/**
+ * Returns the user with the specified uid.
+ * @param {*} req
+ * @param {*} res
+ * @param {*} callback
+ * @example GET /users/<uid>/groups
+ */
 exports.getUser = function(req, res, callback) {
   let status = HTTP_C.OK;
   let retval = '';
 
   let uid = req.locals['uid'] === undefined ? -1 : req.locals['uid'] * 1;
-
-  if (uid >= 0) {
-    loadUserData(returnLoadUserData);
-  } else {
-    status = HTTP_C.BAD_REQUEST;
-    httpHelper.saveResultInRequest(req, status, retval);
-    return callback();
-  }
 
   let returnLoadUserData = function(err, userDict) {
     if (err) {
@@ -191,10 +186,22 @@ exports.getUser = function(req, res, callback) {
     httpHelper.saveResultInRequest(req, status, retval);
     return callback();
   };
+
+  if (uid >= 0) {
+    loadUserData(returnLoadUserData);
+  } else {
+    status = HTTP_C.BAD_REQUEST;
+    httpHelper.saveResultInRequest(req, status, retval);
+    return callback();
+  }
 };
 
 exports.setPasswdFile = function(filePath) {
   passwdFile = filePath;
+};
+
+exports.setGroupFile = function(filePath) {
+  groupFile = filePath;
 };
 
 function loadUserData(callback) {

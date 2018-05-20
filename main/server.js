@@ -33,6 +33,7 @@ let start = function () {
   });
   let router = express.Router();
 
+  // For validating uid parameters
   router.param('uid', function(req, res, next) {
     let tokens = req.url.split('/');
     req.locals.uid = tokens[tokens.length - 1];
@@ -46,9 +47,26 @@ let start = function () {
     }
   });
 
+  // For validating gid parameters
+  router.param('gid', function(req, res, next) {
+    let tokens = req.url.split('/');
+    req.locals.gid = tokens[tokens.length - 1];
 
+    if (isNaN(req.locals.gid) || req.locals.gid < 0) {
+      httpHelper.saveErrorDetailsInRequest(req, HTTP_C.BAD_REQUEST);
+      httpHelper.saveResultInRequest(req, HTTP_C.BAD_REQUEST, '');
+      next(HTTP_C.BAD_REQUEST);
+    } else {
+      next();
+    }
+  });
+
+  // Users
   router.route('/v1/users/:uid(\\d+)')
   .get(services.users.getUser);
+
+  // router.route('/v1/users/:uid(\\d+)/groups')
+  // .get(services.users.getUserGroups);
 
   router.route('/v1/users')
   .get(services.users.getAllUsers);
@@ -56,8 +74,15 @@ let start = function () {
   router.route('/v1/users/query')
   .get(services.users.getUsersQuery);
 
-  // router.route('/v1/groups')
-  // .get(services.groups.getGroups);
+  // Groups
+  router.route('/v1/groups/:gid(\\d+)')
+  .get(services.groups.getGroup);
+
+  router.route('/v1/groups')
+  .get(services.groups.getAllGroups);
+
+  router.route('/v1/groups/query')
+  .get(services.groups.getGroupsQuery);
 
   app.use('/', router);
   app.disable('x-powered-by');
@@ -86,6 +111,8 @@ config.loadConfig(function configReturn(isConfigLoaded) {
   }
 
   services.users.setPasswdFile(config.passwdFile);
+  services.users.setGroupFile(config.groupFile);
+  services.groups.setGroupFile(config.groupFile);
 
   start();
 })
