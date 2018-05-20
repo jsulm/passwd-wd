@@ -10,28 +10,38 @@
 // const async = require('async');
 const HTTP_C = require('../../lib/common/http-constants.js');
 const httpHelper = require('../../lib/server/http-helper.js');
+const passwdHelper = require('../../lib/server/passwd-helper.js');
 
 let passwdFile = '';
 
 exports.getAllUsers = function(req, rex, callback) {
   let outputArray = [];
-
-  let userDict = loadUserData();
-
-  for (let key in  userDict) {
-    outputArray.push(userDict[key]);
-  }
-
   let status = HTTP_C.OK;
   let retval = '';
-  if (outputArray.length <= 0) {
-    status = HTTP_C.NO_CONTENT;
-  } else {
-    retval = JSON.stringify(outputArray);
-  }
 
-  httpHelper.saveResultInRequest(req, status, retval);
-  return callback();
+  let returnLoadUserData = function(err, userDict) {
+    if (err) {
+      status = HTTP_C.INTERNAL_SERVER_ERROR;
+      httpHelper.saveErrorDetailsInRequest(req, status, err);
+      httpHelper.saveResultInRequest(req, status, retval);
+      return callback();
+    }
+
+    for (let key in  userDict) {
+      outputArray.push(userDict[key]);
+    }
+
+    if (outputArray.length <= 0) {
+      status = HTTP_C.NO_CONTENT;
+    } else {
+      retval = JSON.stringify(outputArray);
+    }
+
+    httpHelper.saveResultInRequest(req, status, retval);
+    return callback();
+  };
+
+  loadUserData(returnLoadUserData);
 };
 
 /**
@@ -88,7 +98,7 @@ exports.getUsersQuery = function(req, res, callback) {
 
   if (req.query.uid) {
     uid = parseInt(req.query.uid);
-    if (isNaN(uid) || uid < 0) {
+    if (isNaN(uid)) {
       httpHelper.saveErrorDetailsInRequest(req, HTTP_C.BAD_REQUEST, 'uid');
       httpHelper.saveResultInRequest(req, HTTP_C.BAD_REQUEST, '');
       return callback();
@@ -97,7 +107,7 @@ exports.getUsersQuery = function(req, res, callback) {
 
   if (req.query.gid) {
     gid = parseInt(req.query.gid);
-    if (isNaN(gid) || gid < 0) {
+    if (isNaN(gid)) {
       httpHelper.saveErrorDetailsInRequest(req, HTTP_C.BAD_REQUEST, 'gid');
       httpHelper.saveResultInRequest(req, HTTP_C.BAD_REQUEST, '');
       return callback();
@@ -118,30 +128,39 @@ exports.getUsersQuery = function(req, res, callback) {
 
   // Process string query
   let outputArray = [];
-
-  let userDict = loadUserData();
-
-  for (let key in userDict) {
-    if ((name === '' || name === userDict[key].name) &&
-        (uid === -1 || uid === userDict[key].uid) &&
-        (gid === -1 || gid === userDict[key].gid) &&
-        (comment === '' || comment === userDict[key].comment) &&
-        (home === '' || home === userDict[key].home) &&
-        (shell === '' || shell == userDict[key].shell)) {
-          outputArray.push(userDict[key]);
-    }
-  }
-
   let status = HTTP_C.OK;
   let retval = '';
-  if (outputArray.length <= 0) {
-    status = HTTP_C.NO_CONTENT;
-  } else {
-    retval = JSON.stringify(outputArray);
-  }
 
-  httpHelper.saveResultInRequest(req, status, retval);
-  return callback();
+  let returnLoadUserData = function(err, userDict) {
+    if (err) {
+      status = HTTP_C.INTERNAL_SERVER_ERROR;
+      httpHelper.saveErrorDetailsInRequest(req, status, err);
+      httpHelper.saveResultInRequest(req, status, retval);
+      return callback();
+    }
+
+    for (let key in userDict) {
+      if ((name === '' || name === userDict[key].name) &&
+          (uid === -1 || uid === userDict[key].uid) &&
+          (gid === -1 || gid === userDict[key].gid) &&
+          (comment === '' || comment === userDict[key].comment) &&
+          (home === '' || home === userDict[key].home) &&
+          (shell === '' || shell == userDict[key].shell)) {
+            outputArray.push(userDict[key]);
+      }
+    }
+
+    if (outputArray.length <= 0) {
+      status = HTTP_C.NO_CONTENT;
+    } else {
+      retval = JSON.stringify(outputArray);
+    }
+
+    httpHelper.saveResultInRequest(req, status, retval);
+    return callback();
+  };
+
+  loadUserData(returnLoadUserData);
 };
 
 exports.getUser = function(req, res, callback) {
@@ -151,33 +170,37 @@ exports.getUser = function(req, res, callback) {
   let uid = req.locals['uid'] === undefined ? -1 : req.locals['uid'] * 1;
 
   if (uid >= 0) {
-    let userDict = loadUserData();
-    if (userDict[uid] === null || userDict[uid] === undefined) {
+    loadUserData(returnLoadUserData);
+  } else {
+    status = HTTP_C.BAD_REQUEST;
+    httpHelper.saveResultInRequest(req, status, retval);
+    return callback();
+  }
+
+  let returnLoadUserData = function(err, userDict) {
+    if (err) {
+      status = HTTP_C.INTERNAL_SERVER_ERROR;
+      httpHelper.saveErrorDetailsInRequest(req, status, err);
+    } else if (userDict[uid] === null || userDict[uid] === undefined) {
       status = HTTP_C.NOT_FOUND;
     } else {
       status = HTTP_C.OK;
-      let userDict = loadUserData();
       retval = JSON.stringify(userDict[uid]);
     }
-  } else {
-    status = HTTP_C.BAD_REQUEST;
-  }
 
-  httpHelper.saveResultInRequest(req, status, retval);
-  return callback();
+    httpHelper.saveResultInRequest(req, status, retval);
+    return callback();
+  };
 };
 
 exports.setPasswdFile = function(filePath) {
   passwdFile = filePath;
 };
 
-function loadUserData() {
-  // uid to user details dictionary mapping
-  let userDict = {};
-  userDict[0] = {"name": "root", "uid": 0, "gid": 0, "comment": "root", "home": "/root",
-  "shell": "/bin/bash"};
-  userDict[1001] = {"name": "dwoodlins", "uid": 1001, "gid": 1001, "comment": "", "home":
-  "/home/dwoodlins", "shell": "/bin/false"};
+function loadUserData(callback) {
+  let returnReadUserData = function(err, data) {
+    callback(err, data);
+  };
 
-  return userDict;
+  passwdHelper.readUserData(passwdFile, returnReadUserData);
 }
