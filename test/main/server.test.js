@@ -128,7 +128,7 @@ describe('GET /v1/groups', function() {
   });
 });
 
-describe('GET /v1/groups/query?name=nobody', function() {
+describe('GET /v1/groups/query?name=nogroup', function() {
   it('should respond with json data', function(done) {
     req
       .get('/v1/groups/query?name=nobody')
