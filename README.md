@@ -60,14 +60,6 @@ cd passwd-ws
 sudo npm install
 ```
 
-To run the unit tests, you will need to be in the directory where package.json is located. Then run the command:
-
-```sh
-npm test
-```
-
-To stop the unit test, use 'Ctrl + C'.
-
 To run the server, you will need to cd into the main directory and run the node command:
 
 ```sh
@@ -76,3 +68,30 @@ node server.js
 ```
 
 To stop the server, use 'Ctrl + C'.
+
+### Configuration
+
+The default configuration is development. To change the configuration you can edit /config/dev.json. To change to a different configuration such as production type: export NODE_ENV=production
+
+To change the location of the passwd and group files used by this service you will need to modify passwdFile and groupFile respectively in the configuration file such as dev.json. The expected value to these files should be an absolute path. If you do change the NODE_ENV environment to production be sure to also modify production.json.
+
+Note that making changes to the configuration require stopping and then restarting the server.
+
+### Log Files
+
+Log files are created in passwd-ws/log.
+
+
+### Unit Tests
+
+Note that running the unit tests require stopping the server since it will launch its own instance of the server.
+
+To run the unit tests, you will need to be in the directory where package.json is located. Then run the command:
+
+```sh
+npm test
+```
+
+To stop the unit tests, use 'Ctrl + C'.
+
+The unit test scripts are located in passwd-ws/test.

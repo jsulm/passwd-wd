@@ -1,0 +1,181 @@
+{
+	"info": {
+		"_postman_id": "002e2b78-ed9a-489a-ba05-96bb7c413948",
+		"name": "passwd-ws",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8080/v1/users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/v1/users/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"users",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/v1/users/0",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/v1/users/0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"users",
+						"0"
+					]
+				},
+				"description": "Get by uid"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/v1/users/query?name=root",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/v1/users/query?name=root",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"users",
+						"query"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "root"
+						}
+					]
+				},
+				"description": "Filter by root"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/v1/users/0/groups",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/v1/users/0/groups",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"users",
+						"0",
+						"groups"
+					]
+				},
+				"description": "Get groups for user with UID."
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/v1/groups",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/v1/groups",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"groups"
+					]
+				},
+				"description": "Get all groups"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/v1/groups/0",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/v1/groups/0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"groups",
+						"0"
+					]
+				},
+				"description": "Get group by GID."
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/v1/groups/query?name=nogroup",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/v1/groups/query?name=nogroup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"groups",
+						"query"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "nogroup"
+						}
+					]
+				},
+				"description": "Get group by name."
+			},
+			"response": []
+		}
+	]
+}
