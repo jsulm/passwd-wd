@@ -9,7 +9,6 @@
 /* jslint node: true */
 'use strict';
 
-const express = require('express');
 const app = require('../../main/server.js');
 const config = require('../../lib/common/config.js');
 const request = require('supertest');
@@ -100,6 +99,16 @@ describe('GET /v1/users/0', function() {
   it('should respond with 200', function(done) {
     req
       .get('/v1/users/0')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200, done);
+  });
+});
+
+describe('GET /v1/users/0/groups', function() {
+  it('should respond with 200', function(done) {
+    req
+      .get('/v1/users/0/groups')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200, done);

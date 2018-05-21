@@ -10,3 +10,5 @@
 ##
 nobody:*:-2:
 nogroup:*:-1:
+wheel:*:0:root
+daemon:*:1:root

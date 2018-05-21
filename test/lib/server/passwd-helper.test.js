@@ -55,3 +55,25 @@ describe('readGroupData', function() {
     passwdHelper.readGroupData(badGroupFile, returnReadGroupData);
   });
 });
+
+describe('getGroupsArrayForUserName', function() {
+  it('should have err null', function() {
+    let userDict = {};
+    let groupDict = {};
+
+    let returnReadUserData = function(err, data) {
+      userDict = data;
+      passwdHelper.readGroupData(goodGroupFile, returnReadGroupData);
+    };
+
+    let returnReadGroupData = function(err, data) {
+      groupDict = data;
+      let userGroups = passwdHelper.getGroupsArrayForUserName(
+          userDict[0].name, groupDict);
+
+      assert.equal(userGroups.length > 0, true);
+    };
+
+    passwdHelper.readUserData(goodPasswdFile, returnReadUserData);
+  });
+});

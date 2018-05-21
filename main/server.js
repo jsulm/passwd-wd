@@ -12,7 +12,6 @@
 const express = require('express');
 const app = express();
 const http = require('http');
-// const bodyParser = require('body-parser');
 let server = {};
 
 const config = require('../lib/common/config.js');
@@ -36,7 +35,12 @@ let start = function () {
   // For validating uid parameters
   router.param('uid', function(req, res, next) {
     let tokens = req.url.split('/');
-    req.locals.uid = tokens[tokens.length - 1];
+    if (tokens.length > 2 &&
+        tokens[tokens.length - 1].toLowerCase() === 'groups') {
+          req.locals.uid = tokens[tokens.length - 2];
+    } else {
+      req.locals.uid = tokens[tokens.length - 1];
+    }
 
     if (isNaN(req.locals.uid) || req.locals.uid < 0) {
       httpHelper.saveErrorDetailsInRequest(req, HTTP_C.BAD_REQUEST);
@@ -65,8 +69,8 @@ let start = function () {
   router.route('/v1/users/:uid(\\d+)')
   .get(services.users.getUser);
 
-  // router.route('/v1/users/:uid(\\d+)/groups')
-  // .get(services.users.getUserGroups);
+  router.route('/v1/users/:uid(\\d+)/groups')
+  .get(services.users.getUserGroups);
 
   router.route('/v1/users')
   .get(services.users.getAllUsers);

@@ -7,6 +7,7 @@
 
 'use strict';
 
+const async = require('async');
 const HTTP_C = require('../../lib/common/http-constants.js');
 const httpHelper = require('../../lib/server/http-helper.js');
 const passwdHelper = require('../../lib/server/passwd-helper.js');
@@ -196,6 +197,77 @@ exports.getUser = function(req, res, callback) {
   }
 };
 
+exports.getUserGroups = function(req, res, callback) {
+  let status = HTTP_C.OK;
+  let retval = '';
+  let locals = {};
+  locals.userDict = {};
+  locals.groupDict = {};
+
+  let uid = req.locals['uid'] === undefined ? -1 : req.locals['uid'] * 1;
+
+  async.series([
+    function(next) {
+      let returnLoadUserData = function(err, userDict) {
+        if (err) {
+          status = HTTP_C.INTERNAL_SERVER_ERROR;
+          next(err);
+        } else if (userDict[uid] === null || userDict[uid] === undefined) {
+          status = HTTP_C.NOT_FOUND;
+          next(status);
+        } else {
+          // Valid matching uid found
+          locals.userDict = userDict;
+          next();
+        }
+      };
+
+      if (uid >= 0) {
+        loadUserData(returnLoadUserData);
+      } else {
+        status = HTTP_C.BAD_REQUEST;
+        next(status);
+      }
+    },
+    function(next) {
+      let gid = locals.userDict[uid].gid !== undefined ? locals.userDict[uid].gid : -1;
+
+      let returnLoadGroupData = function(err, groupDict) {
+        if (err) {
+          status = HTTP_C.INTERNAL_SERVER_ERROR;
+          next(err);
+        } else if (groupDict[gid] === null || groupDict[gid] === undefined) {
+          status = HTTP_C.NOT_FOUND;
+          next(status);
+        } else {
+          status = HTTP_C.OK;
+          locals.groupDict = groupDict;
+          next();
+        }
+      };
+
+      if (gid >= 0) {
+        loadGroupData(returnLoadGroupData);
+      } else {
+        status = HTTP_C.BAD_REQUEST;
+        next(status);
+      }
+    },
+    function(next) {
+      retval = JSON.stringify(passwdHelper.getGroupsArrayForUserName(
+          locals.userDict[uid].name, locals.groupDict));
+      next();
+    },
+  ], function allDone(err) {
+    if (err) {
+      httpHelper.saveErrorDetailsInRequest(req, status, err);
+    }
+
+    httpHelper.saveResultInRequest(req, status, retval);
+    return callback();
+  });
+};
+
 exports.setPasswdFile = function(filePath) {
   passwdFile = filePath;
 };
@@ -210,4 +282,12 @@ function loadUserData(callback) {
   };
 
   passwdHelper.readUserData(passwdFile, returnReadUserData);
+}
+
+function loadGroupData(callback) {
+  let returnReadGroupData = function(err, data) {
+    callback(err, data);
+  };
+
+  passwdHelper.readGroupData(groupFile, returnReadGroupData);
 }

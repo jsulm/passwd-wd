@@ -23,6 +23,13 @@
       "name": "Passwd http-helper.test",
       "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
       "args": ["${workspaceFolder}/test/lib/server/http-helper.test.js"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Passwd passwd-helper.test",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "args": ["${workspaceFolder}/test/lib/server/passwd-helper.test.js"]
     }
   ]
 }
