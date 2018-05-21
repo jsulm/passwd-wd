@@ -67,7 +67,6 @@ exports.getGroupsQuery = function(req, res, callback) {
   // Validate query params
   let allParamNamesValid = true;
   Object.keys(req.query).forEach(function(key) {
-    console.log(key);
     if (key !== 'name' &&
         key !== 'gid' &&
         key !== 'member') {
