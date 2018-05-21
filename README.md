@@ -16,7 +16,7 @@ Before installing Node.js, we will need refresh the local package index:
 sudo apt-get update
 ```
 
-Since the default supported version of Node.js is v4.2.6 on Ubuntu, to get more recent version of Node.js we will need to add a PPA (personal package archive) maintained by NodeSource.
+Since the default supported version of Node.js is v4.2.6 on Ubuntu, to get a more recent version of Node.js we will need to add a PPA (personal package archive) maintained by NodeSource.
 
 To add a PPA, first change to your home directory and then use curl to retrieve the installation script for the preferred version of Node.js:
 
@@ -60,7 +60,7 @@ cd passwd-ws
 sudo npm install
 ```
 
-To run the unit test, you will need to be in the directory where package.json is located. Then run the command:
+To run the unit tests, you will need to be in the directory where package.json is located. Then run the command:
 
 ```sh
 npm test
