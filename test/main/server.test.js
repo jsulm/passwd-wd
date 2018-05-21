@@ -138,6 +138,16 @@ describe('GET /v1/groups/query?name=nogroup', function() {
   });
 });
 
+describe('GET /v1/groups/query?name=nogroup&member=ubuntu', function() {
+  it('should respond with no content', function(done) {
+    req
+      .get('/v1/groups/query?name=nogroup&member=ubuntu')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(204, done);
+  });
+});
+
 describe('GET /v1/groups/query?name=badgroup', function() {
   it('should respond with 204', function(done) {
     req
