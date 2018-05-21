@@ -10,7 +10,8 @@
     "winston": "^2.4.2"
   },
   "devDependencies": {
-    "mocha": "^5.1.1"
+    "mocha": "^5.1.1",
+    "supertest": "^3.1.0"
   },
   "scripts": {
     "test": "mocha",
