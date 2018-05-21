@@ -116,7 +116,7 @@ exports.getGroupsQuery = function(req, res, callback) {
       if ((name === '' || name === groupDict[key].name) &&
           (gid === -1 || gid === groupDict[key].gid) &&
           (member.length <= 0 ||
-            containsMembers(groupDict[key].member, member))) {
+            containsMembers(groupDict[key].members, member))) {
             outputArray.push(groupDict[key]);
       }
     }
